@@ -5,10 +5,12 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	gubrak "github.com/novalagung/gubrak/v2"
+	"github.com/regorov/logwriter"
 )
 
 type M map[string]interface{}
@@ -42,6 +44,24 @@ func main() {
 		ReadBufferSize:  1024,
 	}
 
+	cfg := &logwriter.Config{
+		BufferSize:       0,                  // no buffering
+		FreezeInterval:   1 * time.Hour,      // freeze log file every hour
+		HotMaxSize:       100 * logwriter.MB, // 100 MB max file size
+		CompressColdFile: false,              // compress cold file
+		HotPath:          "./log",
+		ColdPath:         "./log/arch",
+		Mode:             logwriter.ProductionMode, // write to file only if prod and write to console and file if debugmode
+	}
+
+	lw, err := logwriter.NewLogWriter("chat app", cfg, false, nil)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	logger := log.New(lw, "chatting app", log.Ldate|log.Ltime)
+	logger.Println("Start chat app")
+
 	router.LoadHTMLFiles("./index.html")
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
@@ -54,15 +74,14 @@ func main() {
 		}
 		username := ctx.Query("username")
 		i++
-		log.Printf("koneksi ke-%d, username : %s\n", i, username)
-		log.Printf("jumlah koneksi : %d", len(connections))
+		logger.Printf("koneksi ke-%d, username : %s\n", i, username)
+		logger.Printf("jumlah koneksi : %d\n", len(connections))
 		currentConn := &WebSocketConnection{Conn: currentGorillaConn, Username: username}
 		connections = append(connections, currentConn)
-
 		go handleIO(currentConn, connections)
 	})
 
-	fmt.Println("Server starting at :8080")
+	fmt.Println("Server starting at :10020")
 	router.Run(":10020")
 }
 
