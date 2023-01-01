@@ -63,7 +63,7 @@ func main() {
 	})
 
 	fmt.Println("Server starting at :8080")
-	router.Run(":8080")
+	router.Run(":10020")
 }
 
 func handleIO(currentConn *WebSocketConnection, connections []*WebSocketConnection) {
