@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -35,13 +36,14 @@ type WebSocketConnection struct {
 }
 
 func main() {
+	cwd, _ := os.Getwd()
 	i := 0
 	router := gin.Default()
 	upgrader := websocket.Upgrader{
 		WriteBufferSize: 1024,
 		ReadBufferSize:  1024,
 	}
-	router.LoadHTMLFiles("./index.html")
+	router.LoadHTMLFiles(fmt.Sprintf("%s/%s", cwd, "index.html"))
 	router.GET("/", func(ctx *gin.Context) {
 		ctx.HTML(http.StatusOK, "index.html", nil)
 	})
