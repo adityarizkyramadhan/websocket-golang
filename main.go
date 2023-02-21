@@ -45,10 +45,10 @@ func main() {
 	}
 
 	cfg := &logwriter.Config{
-		BufferSize:       0,                  // no buffering
-		FreezeInterval:   1 * time.Hour,      // freeze log file every hour
-		HotMaxSize:       100 * logwriter.MB, // 100 MB max file size
-		CompressColdFile: false,              // compress cold file
+		BufferSize:       0,                 // no buffering
+		FreezeInterval:   1 * time.Hour,     // freeze log file every hour
+		HotMaxSize:       10 * logwriter.MB, // 100 MB max file size
+		CompressColdFile: true,              // compress cold file
 		HotPath:          "./log",
 		ColdPath:         "./log/arch",
 		Mode:             logwriter.ProductionMode, // write to file only if prod and write to console and file if debugmode
